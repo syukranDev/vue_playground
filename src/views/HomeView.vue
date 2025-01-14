@@ -5,7 +5,7 @@
 </script>
 
 <template>
-   <Hero title="Test Title" subtitle="Hello" />
+   <Hero title="FindJob" subtitle="Place to find all jobs" />
    <HomeCards />
    <JobListings limit="3" showButton="true"/>
 </template>
