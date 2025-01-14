@@ -1,11 +1,13 @@
 <script setup>
 import JobListingSingle from '@/components/JobListingSingle.vue';
-import jobData from '@/jobs.json'
-import { ref, defineProps } from 'vue';
-
-const jobs = ref(jobData);
+import { ref, defineProps, onMounted, reactive } from 'vue';
+import { RouterLink } from 'vue-router';
+import axios from 'axios';
 
 defineProps({
+    // limit : {
+    //     type: Number
+    // }, // or can write as below
     limit: Number,
     showButton: {
         type: Boolean,
@@ -13,24 +15,50 @@ defineProps({
     }
 })
 
-</script>
+// Option 1 -- this is recommended or easy to understand
+//const jobs = ref([]); //macam useState react, set default value first
+//guna reactive pun boleh instead of ref, 
+// 1) reactive 
+//     -can take objects only
+//     -cannot be reassign
+// 2) ref 
+//    -can take objects or primitive (string, numbers, boolean)
+//    -can reassign using <var>.value = 'new value'
 
+// Option 2
+const state = reactive({
+    jobs: [],
+    isLoading: true
+})
+
+onMounted(async () => { //macam useEffect react, to call api resonse.
+    try {
+        const response = await axios('http://localhost:5000/jobs')
+        // jobs.value = response.data -- Option 1
+        state.jobs = response.data // options 2
+    } catch (e) {
+        console.log('Error fetch jobs data', e.message)
+    } finally {
+        state.isLoading = false
+    }
+})
+</script>
 
 <template>
     <section class="bg-blue-50 px-4 py-10">
         <div class="container-xl lg:container m-auto">
             <h2 class="text-3xl bold text-green-500 mb-6 text-center">Browse Jobs</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <JobListingSingle v-for="job in jobs.slice(0, limit || jobs.length)" :keys="jobs.id" :job="job"/>
+                <JobListingSingle v-for="job in state.jobs.slice(0, limit || state.jobs.length)" :keys="state.jobs.id" :job="job"/>
             </div>
         </div>
     </section>
 
     <section v-if="showButton" class="m-auto max-w-lg my-10 px-6">
-      <a
-        href="/jobs"
+      <RouterLink
+        to="/jobs"
         class="block bg-black text-white text-center py-4 px-6 rounded-xl hover:bg-gray-700"
-        >View All Jobs</a
-      >
+        >View All Jobs
+    </RouterLink>
     </section>
 </template>
