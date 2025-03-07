@@ -36,6 +36,8 @@ onMounted(async () => { //macam useEffect react, to call api resonse.
     try {
         const response = await axios('http://localhost:5000/jobs')
         // jobs.value = response.data -- Option 1
+
+        console.log(response.data)
         state.jobs = response.data // options 2
         state.isLoading = false
     } catch (e) {
